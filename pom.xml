@@ -11,8 +11,8 @@
 	<groupId>home.catechumen</groupId>
 	<artifactId>boot-MVC</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>boot-MVC</name>
-	<description>sandbox Spring Boot</description>
+	<name>rest</name>
+	<description>Spring Boot app</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>

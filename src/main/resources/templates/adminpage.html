@@ -44,7 +44,7 @@
         <div class="col-xs-12 col-md-2">
             <div class="list-group" id="list-tab" role="tablist">
                 <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list"
-                   data-bs-target="#list-tab"
+                   data-bs-target="#list-home"
                    href="#list-home" role="tab" aria-controls="list-home"
                    sec:authorize="hasRole('ROLE_ADMIN')">Admin</a>
                 <a class="list-group-item list-group-item-action" aria-current="true" id="list-profile-list"
@@ -150,17 +150,21 @@
                             <th scope="col">Role</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        <tr th:each="u : ${users}">
-                            <span th:if="${u.getName() == userinfo}">
-                            <td th:text="${u.getId()}"></td>
-                            <td th:text="${u.getName()}"></td>
-                            <td th:text="${u.getDateOfBirth()}"></td>
-                            <td th:text="${u.getLifeTimeDays()}"></td>
-                            <td th:text="${u.getHighEdu()}"></td>
-                            <td th:text="${u.getRoles()}"></td>
-                            </span>
-                        </tr>
+                        <tbody id="currentUserInfo">
+
+
+                        <!--                        <tr th:each="u : ${users}">-->
+                        <!--                            <span th:if="${u.getName() == userinfo}">-->
+                        <!--                            <td th:text="${u.getId()}"></td>-->
+                        <!--                            <td th:text="${u.getName()}"></td>-->
+                        <!--                            <td th:text="${u.getDateOfBirth()}"></td>-->
+                        <!--                            <td th:text="${u.getLifeTimeDays()}"></td>-->
+                        <!--                            <td th:text="${u.getHighEdu()}"></td>-->
+                        <!--                            <td th:text="${u.getRoles()}"></td>-->
+                        <!--                            </span>-->
+                        <!--                        </tr>-->
+
+
                         </tbody>
                     </table>
 
@@ -286,7 +290,7 @@
                                value="highEdu"
                                id="delhighEdu"
                                name="highEdu"
-                                disabled>
+                               disabled>
                         <label class="form-check-label" for="delhighEdu">High
                             Education</label>
                     </div>
@@ -329,6 +333,7 @@
 <script type="text/javascript">
     const URLusers = 'http://localhost:8080/admin/user/'
     const URLroles = 'http://localhost:8080/admin/role/'
+    const URLuser = 'http://localhost:8080/user/'
     const addNewUser = document.getElementById("new-user-form");
     const deleteUser = document.getElementById("delete-form");
     const editUser = document.getElementById("edit-form");
@@ -350,6 +355,7 @@
     let idForm;
 
     getUserList();
+    getUserInfo();
     getRolesList(newRolesSelectorField);
     getRolesList(delRolesSelectorField);
     getRolesList(editRolesSelectorField);
@@ -358,7 +364,7 @@
         let response = await fetch(URLusers);
         if (response.ok) {
             let datajson = await response.json();
-            console.log(datajson)
+            // console.log(datajson)
             let temp = '';
             datajson.forEach((u) => {
                 temp += '<tr>';
@@ -378,11 +384,31 @@
         }
     }
 
+    async function getUserInfo() {
+        let response = await fetch(URLuser);
+        if (response.ok) {
+            let datajson = await response.json();
+            console.log(datajson)
+            let temp = '';
+            temp += '<tr>';
+            temp += '<td>' + datajson.id + '</td>';
+            temp += '<td>' + datajson.name + '</td>';
+            temp += '<td>' + datajson.dateOfBirth + '</td>';
+            temp += '<td>' + datajson.lifeTimeDays + '</td>';
+            temp += '<td>' + datajson.highEdu + '</td>';
+            temp += '<td>' + datajson.roles.map(r => r.role) + '</td>';
+            temp += '</tr>';
+            document.getElementById("currentUserInfo").innerHTML = temp;
+        } else {
+            alert("Error receiving userlist data" + response.status);
+        }
+    }
+
     async function getRolesList(place) {
         let response = await fetch(URLroles);
         if (response.ok) {
             let datajson = await response.json();
-            console.log(datajson)
+            // console.log(datajson)
             datajson.forEach((r) => {
                 place.options[place.options.length] = new Option(r.role, r.id);
             })
@@ -424,12 +450,12 @@
                 delpass.value = datajson.password;
                 delbd.value = datajson.dateOfBirth;
                 console.log(datajson.highEdu)
-                if (datajson.highEdu===true){
+                if (datajson.highEdu === true) {
                     highEduDel.checked = true;
                 } else {
                     highEduDel.checked = false;
                 }
-            console.log(datajson.roles)
+                console.log(datajson.roles)
 
                 // delroles.value = datajson.roles;
             } else {
@@ -455,7 +481,11 @@
                 editpass.value = datajson.password;
                 editbd.value = datajson.dateOfBirth;
                 edithighEdu.value = datajson.highEdu;
+
+
                 editroles.value = datajson.roles;
+
+
             } else {
                 alert("Error receiving user data" + response.status);
             }
@@ -495,10 +525,10 @@
 
     deleteUser.addEventListener('submit', (e) => {
         e.preventDefault()
-        let a = new Promise(function (resolve){
+        let a = new Promise(function (resolve) {
             resolve(fetch(URLusers + idForm, {method: 'DELETE'}))
         })
-        a.then(function (){
+        a.then(function () {
             getUserList();
             modalDelete.hide();
         })

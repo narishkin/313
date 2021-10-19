@@ -43,7 +43,8 @@
     <div class="row">
         <div class="col-xs-12 col-md-2">
             <div class="list-group" id="list-tab" role="tablist">
-                <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" data-bs-target="#list-tab"
+                <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list"
+                   data-bs-target="#list-tab"
                    href="#list-home" role="tab" aria-controls="list-home"
                    sec:authorize="hasRole('ROLE_ADMIN')">Admin</a>
                 <a class="list-group-item list-group-item-action" aria-current="true" id="list-profile-list"
@@ -413,6 +414,7 @@
         console.log(getElement)
         idForm = getElement.firstElementChild.innerHTML
         getUserById();
+
         async function getUserById() {
             let response = await fetch(URLusers + idForm);
             if (response.ok) {
@@ -423,10 +425,13 @@
                 delbd.value = datajson.dateOfBirth;
                 delhighEdu.value = datajson.highEdu;
                 delroles.value = datajson.roles;
+
+                //tut
             } else {
                 alert("Error receiving user data" + response.status);
             }
         }
+
         modalDelete.show();
     })
 
@@ -434,6 +439,7 @@
         const getElement = e.target.parentNode.parentNode
         idForm = getElement.firstElementChild.innerHTML
         getUserById();
+
         async function getUserById() {
             let response = await fetch(URLusers + idForm);
             if (response.ok) {
@@ -449,33 +455,48 @@
                 alert("Error receiving user data" + response.status);
             }
         }
+
         modalEdit.show();
     })
 
     addNewUser.addEventListener('submit', (e) => {
         e.preventDefault()
-        fetch(URLusers, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: newNameField.value,
-                password: newPassField.value,
-                highEdu: highEduCheckBoxSolver(),
-                dateOfBirth: newBDField.value,
-                roles: newRolesSelectorSolver()
-            })
+        let a = new Promise(function (resolve) {
+                resolve(
+                    fetch(URLusers, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: newNameField.value,
+                                password: newPassField.value,
+                                highEdu: highEduCheckBoxSolver(),
+                                dateOfBirth: newBDField.value,
+                                roles: newRolesSelectorSolver()
+                            })
+                        }
+                    )
+                )
+            }
+        )
+        a.then(function () {
+            getuserlist();
+            let listHome = document.getElementById('nav-home-tab');
+            var ft = new bootstrap.Tab(listHome).show();
         })
-        let listHome = document.getElementById('nav-home-tab');
-        var ft = new bootstrap.Tab(listHome).show();
-        getuserlist();
+
     })
 
     deleteUser.addEventListener('submit', (e) => {
         e.preventDefault()
-        fetch(URLusers+idForm , { method: 'DELETE' })
-        modalDelete.hide();
+        let a = new Promise(function (resolve){
+            resolve(fetch(URLusers + idForm, {method: 'DELETE'}))
+        })
+        a.then(function (){
+            getuserlist();
+            modalDelete.hide();
+        })
     })
 
     function highEduCheckBoxSolver() {

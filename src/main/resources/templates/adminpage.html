@@ -43,7 +43,7 @@
     <div class="row">
         <div class="col-xs-12 col-md-2">
             <div class="list-group" id="list-tab" role="tablist">
-                <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list"
+                <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" data-bs-target="#list-tab"
                    href="#list-home" role="tab" aria-controls="list-home"
                    sec:authorize="hasRole('ROLE_ADMIN')">Admin</a>
                 <a class="list-group-item list-group-item-action" aria-current="true" id="list-profile-list"
@@ -417,7 +417,6 @@
             let response = await fetch(URLusers + idForm);
             if (response.ok) {
                 let datajson = await response.json();
-                console.log(datajson)
                 delid.value = datajson.id;
                 delname.value = datajson.name;
                 delpass.value = datajson.password;
@@ -433,7 +432,6 @@
 
     modalSolver(document, 'click', '.btnEdit', e => {
         const getElement = e.target.parentNode.parentNode
-        console.log(getElement)
         idForm = getElement.firstElementChild.innerHTML
         getUserById();
         async function getUserById() {
@@ -456,7 +454,6 @@
 
     addNewUser.addEventListener('submit', (e) => {
         e.preventDefault()
-        console.log(newNameField.value)
         fetch(URLusers, {
             method: 'POST',
             headers: {
@@ -470,8 +467,9 @@
                 roles: newRolesSelectorSolver()
             })
         })
-        var triggerFirstTabEl = document.querySelector('#myTab li:first-child a')
-        bootstrap.Tab.getInstance(triggerFirstTabEl).show() // Select first tab
+        let listHome = document.getElementById('nav-home-tab');
+        var ft = new bootstrap.Tab(listHome).show();
+        getuserlist();
     })
 
     deleteUser.addEventListener('submit', (e) => {

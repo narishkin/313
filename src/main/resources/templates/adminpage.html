@@ -123,7 +123,7 @@
 
                                     <label> Select roles:</label>
                                     <div>
-                                        <select class="form-select" multiple aria-label="multiple select example"
+                                        <select class="form-select" multiple aria-label="multiple select"
                                                 id="newRolesSelector">
                                         </select>
                                     </div>
@@ -171,7 +171,7 @@
 </div>
 
 <div class="modal fade" id="modal-edit" tabindex="-1">
-    <form th:action="@{/admin/users/edit}" method="POST" id="edit-form">
+    <form id="edit-form">
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -222,12 +222,8 @@
 
                     <label> Roles:</label>
                     <div>
-                        <select class="form-select" multiple
-                                aria-label="multiple select example" id="editroles">
-                            <th:block th:each="role : ${listRoles}">
-                                <option>
-                                </option>
-                            </th:block>
+                        <select class="form-select" multiple aria-label="multiple select example"
+                                id="editRolesSelector">
                         </select>
                     </div>
 
@@ -244,7 +240,7 @@
 </div>
 
 <div class="modal fade" id="modal-delete" tabindex="-1">
-    <form th:action="@{/admin/users/delete/{id}}" method="delete" id="delete-form">
+    <form id="delete-form">
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -290,20 +286,15 @@
                                value="highEdu"
                                id="delhighEdu"
                                name="highEdu"
-                               >
+                                disabled>
                         <label class="form-check-label" for="delhighEdu">High
                             Education</label>
                     </div>
 
                     <label> Roles:</label>
                     <div>
-                        <select class="form-select" multiple
-                                aria-label="multiple select example"
-                                disabled id="delroles">
-                            <th:block th:each="role : ${listRoles}">
-                                <option th:text="1" th:value="1">
-                                </option>
-                            </th:block>
+                        <select class="form-select" multiple aria-label="multiple select example"
+                                id="delRolesSelector" disabled>
                         </select>
                     </div>
 
@@ -340,19 +331,30 @@
     const URLroles = 'http://localhost:8080/admin/role/'
     const addNewUser = document.getElementById("new-user-form");
     const deleteUser = document.getElementById("delete-form");
+    const editUser = document.getElementById("edit-form");
+    const editIdField = document.getElementById('editid');
     const newNameField = document.getElementById('newname');
+    const editNameField = document.getElementById('editname');
     const newPassField = document.getElementById('newpass');
+    const editPassField = document.getElementById('editpass');
     const newHighEduField = document.getElementById('newhighEdu');
+    const editHighEduField = document.getElementById('edithighEdu');
     const newBDField = document.getElementById('newbd');
+    const editBDField = document.getElementById('editbd');
     const newRolesSelectorField = document.getElementById('newRolesSelector');
+    const delRolesSelectorField = document.getElementById('delRolesSelector');
+    const editRolesSelectorField = document.getElementById('editRolesSelector');
     const modalEdit = new bootstrap.Modal(document.getElementById('modal-edit'))
     const modalDelete = new bootstrap.Modal(document.getElementById('modal-delete'))
+    const highEduDel = document.getElementById("delhighEdu");
+    let idForm;
 
+    getUserList();
+    getRolesList(newRolesSelectorField);
+    getRolesList(delRolesSelectorField);
+    getRolesList(editRolesSelectorField);
 
-    getuserlist();
-    getRolesList();
-
-    async function getuserlist() {
+    async function getUserList() {
         let response = await fetch(URLusers);
         if (response.ok) {
             let datajson = await response.json();
@@ -376,19 +378,18 @@
         }
     }
 
-    async function getRolesList() {
+    async function getRolesList(place) {
         let response = await fetch(URLroles);
         if (response.ok) {
             let datajson = await response.json();
             console.log(datajson)
             datajson.forEach((r) => {
-                newRolesSelectorField.options[newRolesSelectorField.options.length] = new Option(r.role, r.id);
+                place.options[place.options.length] = new Option(r.role, r.id);
             })
         } else {
             alert("Error receiving rolesList data" + response.status);
         }
     }
-
 
     function editButton() {
         let cell = document.createElement('td');
@@ -400,7 +401,6 @@
         return cell.innerHTML = '<td><button type="button" class="btnDelete btn btn-danger" data-bs-toggle="modal">Delete</button></td>'
     }
 
-
     const modalSolver = function (element, event, selector, handler) {
         element.addEventListener(event, e => {
             if (e.target.closest(selector)) {
@@ -408,7 +408,7 @@
             }
         })
     }
-    let idForm;
+
     modalSolver(document, 'click', '.btnDelete', e => {
         const getElement = e.target.parentNode.parentNode
         console.log(getElement)
@@ -423,12 +423,15 @@
                 delname.value = datajson.name;
                 delpass.value = datajson.password;
                 delbd.value = datajson.dateOfBirth;
-                if (datajson.highEdu){
-                    delhighEdu.value = "on";
+                console.log(datajson.highEdu)
+                if (datajson.highEdu===true){
+                    highEduDel.checked = true;
+                } else {
+                    highEduDel.checked = false;
                 }
-                delroles.value = datajson.roles;
+            console.log(datajson.roles)
 
-                //tut
+                // delroles.value = datajson.roles;
             } else {
                 alert("Error receiving user data" + response.status);
             }
@@ -473,9 +476,9 @@
                             body: JSON.stringify({
                                 name: newNameField.value,
                                 password: newPassField.value,
-                                highEdu: highEduCheckBoxSolver(),
+                                highEdu: highEduCheckBoxSolver(newHighEduField),
                                 dateOfBirth: newBDField.value,
-                                roles: newRolesSelectorSolver()
+                                roles: RolesSelectorSolver(newRolesSelectorField)
                             })
                         }
                     )
@@ -483,7 +486,7 @@
             }
         )
         a.then(function () {
-            getuserlist();
+            getUserList();
             let listHome = document.getElementById('nav-home-tab');
             var ft = new bootstrap.Tab(listHome).show();
         })
@@ -496,26 +499,55 @@
             resolve(fetch(URLusers + idForm, {method: 'DELETE'}))
         })
         a.then(function (){
-            getuserlist();
+            getUserList();
             modalDelete.hide();
         })
     })
 
-    function highEduCheckBoxSolver() {
-        if (newHighEduField.checked) {
+    editUser.addEventListener('submit', (e) => {
+        e.preventDefault()
+        let a = new Promise(function (resolve) {
+                resolve(
+                    fetch(URLusers, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                id: editIdField.value,
+                                name: editNameField.value,
+                                password: editPassField.value,
+                                highEdu: highEduCheckBoxSolver(editHighEduField),
+                                dateOfBirth: editBDField.value,
+                                roles: RolesSelectorSolver(editRolesSelectorField)
+                            })
+                        }
+                    )
+                )
+            }
+        )
+        a.then(function () {
+            getUserList();
+            modalEdit.hide();
+        })
+
+    })
+
+    function highEduCheckBoxSolver(place) {
+        if (place.checked) {
             return true;
         } else {
             return false;
         }
     }
 
-    function newRolesSelectorSolver() {
+    function RolesSelectorSolver(place) {
         let JSONArr = [];
-        for (let i = 0; i < newRolesSelectorField.options.length; i++) {
-            if (newRolesSelectorField.options[i].selected) {
+        for (let i = 0; i < place.options.length; i++) {
+            if (place.options[i].selected) {
                 JSONArr.push({
-                    id: newRolesSelectorField.options[i].value,
-                    role: newRolesSelectorField.options[i].text
+                    id: place.options[i].value,
+                    role: place.options[i].text
                 })
             }
         }

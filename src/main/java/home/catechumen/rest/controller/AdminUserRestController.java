@@ -40,6 +40,7 @@ public class AdminUserRestController {
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
+        System.out.println(user);
         userService.update(user);
         return user;
     }

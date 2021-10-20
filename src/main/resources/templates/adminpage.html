@@ -15,14 +15,14 @@
     <div class="container-fluid">
         <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
             <ul class="navbar-nav me-auto" style="align-items: baseline">
-                <div class="navbar-brand flex-grow-1 ">
-                    <h4 class="mb-1" th:text="${userinfo}" style="color: #f1f1f1"></h4>
+                <div class="navbar-brand flex-grow-1" id="currentUserName">
+                    <h4 class="mb-1" style="color: #f1f1f1"></h4>
                 </div>
                 <div class="navbar-brand flex-grow-1 align-baseline">
                     <p style="color: #f1f1f1" class="fst-italic mb-1">with roles:</p>
                 </div>
-                <span class="navbar-brand flex-grow-1 align-baseline">
-                    <h5 class="mb-2" style="color: #f1f1f1" th:text="${userRoles}"></h5>
+                <span class="navbar-brand flex-grow-1 align-baseline" id="currentUserRoles">
+                    <h5 class="mb-2" style="color: #f1f1f1" ></h5>
                 </span>
             </ul>
         </div>
@@ -352,6 +352,7 @@
     const modalEdit = new bootstrap.Modal(document.getElementById('modal-edit'))
     const modalDelete = new bootstrap.Modal(document.getElementById('modal-delete'))
     const highEduDel = document.getElementById("delhighEdu");
+    const userTab = document.getElementById('list-profile-list');
     let idForm;
 
     getUserList();
@@ -399,6 +400,13 @@
             temp += '<td>' + datajson.roles.map(r => r.role) + '</td>';
             temp += '</tr>';
             document.getElementById("currentUserInfo").innerHTML = temp;
+            let un = datajson.name;
+            document.getElementById("currentUserName").innerText = un;
+            let ur = datajson.roles.map(r => r.role).toString();
+            document.getElementById("currentUserRoles").innerText = ur;
+            if (!ur.includes('ADMIN')){
+                let showUserTab = new bootstrap.Tab(userTab).show();
+            }
         } else {
             alert("Error receiving userlist data" + response.status);
         }
@@ -408,7 +416,6 @@
         let response = await fetch(URLroles);
         if (response.ok) {
             let datajson = await response.json();
-            // console.log(datajson)
             datajson.forEach((r) => {
                 place.options[place.options.length] = new Option(r.role, r.id);
             })
@@ -518,7 +525,7 @@
         a.then(function () {
             getUserList();
             let listHome = document.getElementById('nav-home-tab');
-            var ft = new bootstrap.Tab(listHome).show();
+            let ft = new bootstrap.Tab(listHome).show();
         })
 
     })

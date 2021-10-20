@@ -19,6 +19,7 @@ const editRolesSelectorField = document.getElementById('editRolesSelector');
 const modalEdit = new bootstrap.Modal(document.getElementById('modal-edit'))
 const modalDelete = new bootstrap.Modal(document.getElementById('modal-delete'))
 const highEduDel = document.getElementById("delhighEdu");
+const highEduEdit = document.getElementById("edithighEdu");
 const userTab = document.getElementById('list-profile-list');
 let idForm;
 
@@ -70,7 +71,7 @@ async function getUserInfo() {
         let ur = datajson.roles.map(r => r.role).toString();
         document.getElementById("currentUserRoles").innerText = ur;
         if (!ur.includes('ADMIN')) {
-            let showUserTab = new bootstrap.Tab(userTab).show();
+            new bootstrap.Tab(userTab).show();
         }
     } else {
         alert("Error receiving userlist data" + response.status);
@@ -109,7 +110,6 @@ const modalSolver = function (element, event, selector, handler) {
 
 modalSolver(document, 'click', '.btnDelete', e => {
     const getElement = e.target.parentNode.parentNode
-    console.log(getElement)
     idForm = getElement.firstElementChild.innerHTML
     getUserById();
 
@@ -121,15 +121,13 @@ modalSolver(document, 'click', '.btnDelete', e => {
             delname.value = datajson.name;
             delpass.value = datajson.password;
             delbd.value = datajson.dateOfBirth;
-            console.log(datajson.highEdu)
-            if (datajson.highEdu === true) {
+            if (datajson.highEdu) {
                 highEduDel.checked = true;
             } else {
                 highEduDel.checked = false;
             }
-            console.log(datajson.roles)
 
-            // delroles.value = datajson.roles;
+
         } else {
             alert("Error receiving user data" + response.status);
         }
@@ -147,17 +145,21 @@ modalSolver(document, 'click', '.btnEdit', e => {
         let response = await fetch(URLusers + idForm);
         if (response.ok) {
             let datajson = await response.json();
-            console.log(datajson)
             editid.value = datajson.id;
             editname.value = datajson.name;
             editpass.value = datajson.password;
             editbd.value = datajson.dateOfBirth;
-            edithighEdu.value = datajson.highEdu;
+            if (datajson.highEdu) {
+                highEduEdit.checked = true;
+            } else {
+                highEduEdit.checked = false;
+            }
             editroles.value = datajson.roles;
         } else {
             alert("Error receiving user data" + response.status);
         }
     }
+
     modalEdit.show();
 })
 
@@ -185,7 +187,7 @@ addNewUser.addEventListener('submit', (e) => {
     a.then(function () {
         getUserList();
         let listHome = document.getElementById('nav-home-tab');
-        let ft = new bootstrap.Tab(listHome).show();
+        new bootstrap.Tab(listHome).show();
     })
 
 })
@@ -247,6 +249,5 @@ function RolesSelectorSolver(place) {
             })
         }
     }
-    console.log(" selectedRoles: " + JSONArr.map(r => r.role));
     return JSONArr;
 }

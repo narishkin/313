@@ -30,8 +30,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/")
                 .permitAll()
-                .antMatchers("/admin/**").hasAnyRole("ADMIN","USER","VIEWER")
-                .antMatchers("/user").hasRole("USER")
+//                .antMatchers("/admin/**").hasAnyRole("ADMIN","USER","VIEWER")
+//                .antMatchers("/user/**").hasAnyRole("USER","VIEWER")
+                .antMatchers("/adminpage").hasRole("ADMIN")
+                .antMatchers("/admin/user").hasRole("ADMIN")
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -51,6 +53,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         daoAuthenticationProvider.setUserDetailsService(userDetailsServiceImpl);
         return daoAuthenticationProvider;
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers(
+
+                // статика
+                "/static/**"
+
+        );
     }
 
 }

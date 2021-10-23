@@ -1,9 +1,10 @@
 package home.catechumen.rest.controller;
 
-
 import home.catechumen.rest.config.exceptionhandler.UserNotFoundException;
 import home.catechumen.rest.model.User;
 import home.catechumen.rest.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,38 +20,40 @@ public class AdminUserRestController {
     }
 
     @GetMapping
-    public List<User> showAllUsers() {
-        return userService.getAll();
+    public ResponseEntity<List<User>> showAllUsers() {
+        return new ResponseEntity<>(userService.getAll(),HttpStatus.OK);
     }
 
+
     @GetMapping("/{userid}")
-    public User showUserById(@PathVariable("userid") Long userid) {
+    public ResponseEntity<User> showUserById(@PathVariable("userid") Long userid) {
         User user = userService.getById(userid);
         if (user == null) {
             throw new UserNotFoundException("User not found, id: " + userid);
         }
-        return user;
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping
-    public User addUser(@RequestBody User user) {
+    public ResponseEntity<User> addUser(@RequestBody User user) {
         userService.save(user);
-        return user;
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
+    public ResponseEntity<User> updateUser(@RequestBody User user) {
         System.out.println(user);
         userService.update(user);
-        return user;
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping("/{userid}")
-    public void deleteUser(@PathVariable("userid") Long userid) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("userid") Long userid) {
         User user = userService.getById(userid);
         if (user == null) {
-            throw new UserNotFoundException("no users found, id:" + userid);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         userService.delete(userid);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

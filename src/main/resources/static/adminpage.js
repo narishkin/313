@@ -126,13 +126,10 @@ modalSolver(document, 'click', '.btnDelete', e => {
             } else {
                 highEduDel.checked = false;
             }
-
-
         } else {
             alert("Error receiving user data" + response.status);
         }
     }
-
     modalDelete.show();
 })
 
@@ -159,7 +156,6 @@ modalSolver(document, 'click', '.btnEdit', e => {
             alert("Error receiving user data" + response.status);
         }
     }
-
     modalEdit.show();
 })
 
@@ -189,7 +185,6 @@ addNewUser.addEventListener('submit', (e) => {
         let listHome = document.getElementById('nav-home-tab');
         new bootstrap.Tab(listHome).show();
     })
-
 })
 
 deleteUser.addEventListener('submit', (e) => {
